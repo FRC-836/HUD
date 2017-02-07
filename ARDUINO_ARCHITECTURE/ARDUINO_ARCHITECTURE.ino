@@ -10,7 +10,6 @@ char inputs[4] = { 0, 0, 0, 0 };
 
 //colors that change with color mode
 uint32_t defaultColor;
-uint32_t autonomousColor;
 uint32_t pilotAttentionColor;
 uint32_t ballGettingColor;
 uint32_t gearGettingColor;
@@ -115,19 +114,6 @@ void loop()
       //invalid command
       break;
   }
-  }
-}
-
-void setColorsMode(uint8_t mode)
-{
-  switch (mode)
-  case 1:
-    defaultColor = strip.Color(255, 0, 90);
-    autonomousColor = 15;
-    pilotAttentionColor = strip.Color(255, 79, 0);
-    ballGettingColor = strip.Color(0, 200, 0);
-    gearGettingColor = strip.Color(225, 225, 0);
-    raveColors = 25;
 }
 void setOpMode(uint8_t opMode)
 {
@@ -142,11 +128,44 @@ void setOpMode(uint8_t opMode)
       break;
   }
 }
-
-//void autonomousRainbow()
-//{
-  // Deprecated. //
-//}
+void setColorMode (char i)
+{
+  if (i == 1)
+  {
+    defaultColor = strip.Color(255, 0, 255);
+    pilotAttentionColor = strip.Color(255, 79, 0);
+    ballGettingColor = strip.Color(0, 255, 0);
+    gearGettingColor = strip.Color(255, 255, 0);
+  }
+  else if (i == 2)
+  {
+    defaultColor = strip.Color(0, 255, 0);
+    pilotAttentionColor = strip.Color(0, 0, 0); // TODO: make it
+    ballGettingColor = strip.Color(255, 0, 255);
+    gearGettingColor = strip.Color(0, 0, 255);
+  }
+  else if (i == 3)
+  {
+    defaultColor = strip.Color(0, 0, 255);
+    pilotAttentionColor = strip.Color(0, 0, 0); // TODO: make it
+    ballGettingColor = strip.Color(200, 0, 100);
+    gearGettingColor = strip.Color(0, 255, 255);
+  }
+  else if (i == 4)
+  {
+    defaultColor = strip.Color(255, 255, 255);
+    pilotAttentionColor = strip.Color(0, 0, 0); // TODO: make it
+    ballGettingColor = strip.Color(0, 0, 255);
+    gearGettingColor = strip.Color(255, 79, 0);
+  }
+  else if (i == 5)
+  {
+    defaultColor = strip.Color(100, 0, 255);
+    pilotAttentionColor = strip.Color(0, 0, 0); // TODO: make it
+    ballGettingColor = strip.Color(255, 79, 0);
+    gearGettingColor = strip.Color(100, 200, 0);
+  }
+}
 
 void defaultMode()
 {
@@ -199,7 +218,7 @@ void gearDeliveryMode()
 { 
   if (state == 0)
   {
-    gearDeliveryGreenState();
+    gearDeliveryAState();
     delay(25);
   }
   else if (state == 1)
@@ -215,7 +234,7 @@ void gearDeliveryMode()
   }
 }
 
-void gearDeliveryGreenState()
+void gearDeliveryAState()
 {
   if (gsplit == NUM_PIXELS / 2)
   {
@@ -271,48 +290,48 @@ void bothReceivingMode()
   strip.show();
   return;
 }
-//kept as an example, needs optimizing
-/*void timeWarning60()
+void timeWarning(char currentTime)
 {
-  for (int i = 0; i < NUM_PIXELS; i++)
-  {
-    strip.setPixelColor(i, timeColor60);
-  }
+  //color selection based on time remaining
+  uint32_t color;
+  if (currentTime == 60) 
+    color = strip.Color(0, 255, 0);
+  else if (currentTime == 30) 
+    color = strip.Color(255, 255, 0);
+  else if (currentTime == 10) 
+    color = strip.Color(0, 0, 255);
+  else 
+    return;
+
+  for (int i = 0; i < strip.numPixels(); i++) 
+    strip.setPixelColor(i, color);
   strip.show();
   delay(750);
-  for (int i = 0; i < NUM_PIXELS; i++)
-  {
+
+  for (int i = 0; i < strip.numPixels(); i++) 
     strip.setPixelColor(i, strip.Color(255, 255, 255));
-  }
   strip.show();
   delay(250);
-  for (int i = 0; i < NUM_PIXELS; i++)
-  {
-    strip.setPixelColor(i, timeColor60);
-  }
+
+  for (int i = 0; i < strip.numPixels(); i++) 
+    strip.setPixelColor(i, color);
   strip.show();
   delay(750);
-  for (int i = 0; i < NUM_PIXELS; i++)
-  {
+
+  for (int i = 0; i < strip.numPixels(); i++) 
     strip.setPixelColor(i, strip.Color(255, 255, 255));
-  }
   strip.show();
   delay(250);
-  for (int i = 0; i < NUM_PIXELS; i++)
-  {
-    strip.setPixelColor(i, timeColor60);
-  }
+
+  for (int i = 0; i < strip.numPixels(); i++) 
+    strip.setPixelColor(i, color);
   strip.show();
   delay(750);
-  for (int i = 0; i < NUM_PIXELS; i++)
-  {
+
+  for (int i = 0; i < strip.numPixels(); i++) 
     strip.setPixelColor(i, strip.Color(255, 255, 255));
-  }
   strip.show();
   delay(250);
-}*/
-void timeWarning(uint8_t secsLeft)
-{
 }
 
 char num = 0;
