@@ -1,26 +1,64 @@
 #include <Adafruit_NeoPixel.h>
 #include <Wire.h>
 
-#define PIN 6
+//constants
+const int PIN = 6;
+const int NUM_PIXELS = 16;
 
+//packet
 char inputs[4] = { 0, 0, 0, 0 };
 
+//colors that change with color mode
 uint32_t defaultColor;
 uint32_t pilotAttentionColor;
 uint32_t ballGettingColor;
 uint32_t gearGettingColor;
 uint32_t raveColors;
 
-Adafruit_NeoPixel strip = Adafruit_NeoPixel(16, PIN, NEO_GRB + NEO_KHZ800);
+//colors that never change
+const uint32_t timeColor90 = strip.Color(0, 255, 0);
+const uint32_t timeColor60 = strip.Color(255, 255, 0);
+const uint32_t timeColor30 = strip.Color(255, 0, 0);
+
+//neopixel strip
+Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUM_PIXELS, PIN, 
+                                            NEO_GRB + NEO_KHZ800);
+
+//enums
+enum class COMMANDS : uint8_t
+{
+  SET_OPERATING_MODE = 0,
+  SET_COLOR_MODE,
+  DEFAULT_COLORS,
+  PILOT_ATTENTION,
+  GET_BALL,
+  GET_GEAR,
+  GET_BOTH,
+  GEAR_DELIVERY,
+  TIME_WARNING,
+  TARGETING_MODE,
+};
+enum class OP_MODE : uint8_t
+{
+  COMPETITION,
+  DEBUG,
+};
 
 void setup() 
 {
+  //setup I2C
   Wire.begin(0);
   Wire.onReceive(receiveEvent);
+
+  //set up serial (may be unnecessary)
   Serial.begin(9600);
+
+  //setup the neopixel strip
   strip.begin();
   strip.setBrightness(55);
   strip.show();
+
+  //set initial color mode
   setColors(1);
 }
 
@@ -28,6 +66,8 @@ byte count = 0;
 
 void receiveEvent(byte howMany)
 {
+  //not a good idea, could theoretically get negative array index
+  //FIX
   while (howMany)
   {
     inputs[4-howMany] = Wire.read();
@@ -37,23 +77,57 @@ void receiveEvent(byte howMany)
 
 void loop()
 {
-  if      (inputs[0] == 1)  setOperationMode(inputs[1]);
-  else if (inputs[0] == 2)  setColorMode(inputs[1]);
-  else if (inputs[0] == 3)  defaultMode();
-  else if (inputs[0] == 4)  pilotAttentionMode();
-  else if (inputs[0] == 5)  ballReceivingMode();
-  else if (inputs[0] == 6)  gearReceivingMode();
-  else if (inputs[0] == 7)  bothReceivingMode();
-  else if (inputs[0] == 8)  gearDeliveryMode();
-  else if (inputs[0] == 9)  timeWarning(inputs[1]);
-  else if (inputs[0] == 10) pilotAttentionMode();
+  //switch on command
+  switch (inputs[0])
+  {
+    case DEFAULT:
+      defaultMode();
+      break;
+    case PILOT_ATTENTION:
+      pilotAttentionMode();
+      break;
+    case GET_BALL:
+      ballReceivingMode();
+      break;
+    case GET_GEAR:
+      gearReceivingMode();
+      break;
+    case GET_BOTH:
+      bothReceivingMode();
+      break;
+    case GEAR_DELIVERY:
+      gearDeliveryMode()
+      break;
+    case TIME_WARNING:
+      timeWarning(/*num seconds left goes here*/);
+      break;
+    case TARGETING_MODE:
+      targetingMode();
+      break;
+    case SET_COLOR_MODE:
+      setColorMode(/*color mode goes here*/);
+      break;
+    case SET_OPERATING_MODE:
+      setOpMode(/*color mode goes here*/);
+      break;
+    default:
+      //invalid command
+      break;
+  }
 }
-
-void setOperationMode (char i)
+void setOpMode(uint8_t opMode)
 {
-  
+  switch(opMode)
+  {
+    case COMPETITION:
+      break;
+    case DEBUG:
+      break;
+    default:
+      //invalid op mode
+      break;
+  }
 }
-
 void setColorMode (char i)
 {
   if (i == 1)
@@ -95,7 +169,7 @@ void setColorMode (char i)
 
 void defaultMode()
 {
-  for (int i = 0; i < strip.numPixels(); i++)
+  for (int i = 0; i < NUM_PIXELS; i++)
   {
     strip.setPixelColor(i, defaultColor);
   }
@@ -105,7 +179,7 @@ void defaultMode()
 
 void pilotAttentionMode()
 {
-  for (int i = 0; i < strip.numPixels(); i++)
+  for (int i = 0; i < NUM_PIXELS; i++)
   {
     if (i % 2 == 0)
       strip.setPixelColor(i, pilotAttentionColor);
@@ -118,7 +192,7 @@ void pilotAttentionMode()
 
 void ballReceivingMode()
 {
-  for (int i = 0; i < strip.numPixels(); i++)
+  for (int i = 0; i < NUM_PIXELS; i++)
   {
     strip.setPixelColor(i, ballGettingColor);
   }
@@ -128,7 +202,7 @@ void ballReceivingMode()
 
 void gearReceivingMode()
 {
-  for (int i = 0; i < strip.numPixels(); i++)
+  for (int i = 0; i < NUM_PIXELS; i++)
   {
     strip.setPixelColor(i, gearGettingColor);
   }
@@ -162,14 +236,14 @@ void gearDeliveryMode()
 
 void gearDeliveryAState()
 {
-  if (gsplit == strip.numPixels() / 2)
+  if (gsplit == NUM_PIXELS / 2)
   {
     state++;
     return;
   }
-  for (int i = 0; i < strip.numPixels(); i++)
+  for (int i = 0; i < NUM_PIXELS; i++)
   {
-    if (i >= 0 + gsplit && i < strip.numPixels() / 2 + gsplit)
+    if (i >= 0 + gsplit && i < NUM_PIXELS / 2 + gsplit)
     {
       strip.setPixelColor(i, gearGettingColor);
     }
@@ -184,14 +258,14 @@ void gearDeliveryAState()
 
 void gearDeliveryWhiteState()
 {
-  if (wsplit == strip.numPixels() / 2)
+  if (wsplit == NUM_PIXELS / 2)
   {
     state++;
     return;
   }
-  for (int i = 0; i < strip.numPixels(); i++)
+  for (int i = 0; i < NUM_PIXELS; i++)
   {
-    if (i >= 0 + wsplit && i < strip.numPixels() / 2 + wsplit)
+    if (i >= 0 + wsplit && i < NUM_PIXELS / 2 + wsplit)
     {
       strip.setPixelColor(i, strip.Color(255, 255, 255));
     }
@@ -206,7 +280,7 @@ void gearDeliveryWhiteState()
 
 void bothReceivingMode()
 {
-  for (int i = 0, count = 1; i < strip.numPixels(); i++, count++)
+  for (int i = 0, count = 1; i < NUM_PIXELS; i++, count++)
   {
     if (i < 4) strip.setPixelColor(i, ballGettingColor);
     else if (i < 8) strip.setPixelColor(i, gearGettingColor);
@@ -218,27 +292,44 @@ void bothReceivingMode()
 }
 void timeWarning(char currentTime)
 {
+  //color selection based on time remaining
   uint32_t color;
-  if      (currentTime == 60) color = strip.Color(0, 255, 0);
-  else if (currentTime == 30) color = strip.Color(255, 255, 0);
-  else if (currentTime == 10) color = strip.Color(0, 0, 255);
-  else return;
-  for (int i = 0; i < strip.numPixels(); i++) strip.setPixelColor(i, color);
+  if (currentTime == 60) 
+    color = strip.Color(0, 255, 0);
+  else if (currentTime == 30) 
+    color = strip.Color(255, 255, 0);
+  else if (currentTime == 10) 
+    color = strip.Color(0, 0, 255);
+  else 
+    return;
+
+  for (int i = 0; i < strip.numPixels(); i++) 
+    strip.setPixelColor(i, color);
   strip.show();
   delay(750);
-  for (int i = 0; i < strip.numPixels(); i++) strip.setPixelColor(i, strip.Color(255, 255, 255));
+
+  for (int i = 0; i < strip.numPixels(); i++) 
+    strip.setPixelColor(i, strip.Color(255, 255, 255));
   strip.show();
   delay(250);
-  for (int i = 0; i < strip.numPixels(); i++) strip.setPixelColor(i, color);
+
+  for (int i = 0; i < strip.numPixels(); i++) 
+    strip.setPixelColor(i, color);
   strip.show();
   delay(750);
-  for (int i = 0; i < strip.numPixels(); i++) strip.setPixelColor(i, strip.Color(255, 255, 255));
+
+  for (int i = 0; i < strip.numPixels(); i++) 
+    strip.setPixelColor(i, strip.Color(255, 255, 255));
   strip.show();
   delay(250);
-  for (int i = 0; i < strip.numPixels(); i++) strip.setPixelColor(i, color);
+
+  for (int i = 0; i < strip.numPixels(); i++) 
+    strip.setPixelColor(i, color);
   strip.show();
   delay(750);
-  for (int i = 0; i < strip.numPixels(); i++) strip.setPixelColor(i, strip.Color(255, 255, 255));
+
+  for (int i = 0; i < strip.numPixels(); i++) 
+    strip.setPixelColor(i, strip.Color(255, 255, 255));
   strip.show();
   delay(250);
 }
@@ -247,8 +338,9 @@ char num = 0;
 
 void targetingMode()
 {
-  if (num == strip.numPixels()) num = 0;
-  for (int i = 0; i < strip.numPixels(); i++)
+  if (num == NUM_PIXELS)
+    num = 0;
+  for (int i = 0; i < NUM_PIXELS; i++)
   {
     if (i >= 0 + num && i < 1 + num)
       strip.setPixelColor(i, strip.Color(255, 0, 0));
