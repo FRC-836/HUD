@@ -16,7 +16,6 @@ uint32_t ballGettingColor;
 uint32_t gearGettingColor;
 uint32_t raveColors;
 
-
 //neopixel strip
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUM_PIXELS, PIN, 
                                             NEO_GRBW + NEO_KHZ800);
@@ -60,7 +59,6 @@ void setup()
   strip.begin();
   strip.setBrightness(BRIGHTNESS);
   strip.show();
-
   //set initial color mode
   setColorMode(1);
 }
@@ -79,13 +77,6 @@ void receiveEvent(uint8_t howMany)
 
 void loop()
 {
-  Serial.print(inputs[0]);
-  Serial.print(", ");
-  Serial.print(inputs[1]);
-  Serial.print(", ");
-  Serial.print(inputs[2]);
-  Serial.print(", ");
-  Serial.println(inputs[3]);
   //switch on command
   switch (inputs[1])
   {
@@ -315,32 +306,28 @@ void timeWarning(uint8_t currentTime)
   else 
     return;
 
-  for (int i = 0; i < NUM_PIXELS; i++) 
+  for (uint8_t i = 0; i < NUM_PIXELS; i++) 
     strip.setPixelColor(i, color);
   strip.show();
   delay(750);
-
-  for (int i = 0; i < NUM_PIXELS; i++) 
+  for (uint8_t i = 0; i < NUM_PIXELS; i++) 
     strip.setPixelColor(i,  strip.Color(255, 255, 255, 255));
   strip.show();
   delay(250);
 
-  for (int i = 0; i < NUM_PIXELS; i++) 
+  for (uint8_t i = 0; i < NUM_PIXELS; i++) 
     strip.setPixelColor(i, color);
   strip.show();
   delay(750);
-
-  for (int i = 0; i < NUM_PIXELS; i++) 
+  for (uint8_t i = 0; i < NUM_PIXELS; i++) 
     strip.setPixelColor(i,  strip.Color(255, 255, 255, 255));
   strip.show();
   delay(250);
-
-  for (int i = 0; i < NUM_PIXELS; i++) 
+  for (uint8_t i = 0; i < NUM_PIXELS; i++) 
     strip.setPixelColor(i, color);
   strip.show();
   delay(750);
-
-  for (int i = 0; i < NUM_PIXELS; i++) 
+  for (uint8_t i = 0; i < NUM_PIXELS; i++) 
     strip.setPixelColor(i,  strip.Color(255, 255, 255, 255));
   strip.show();
   delay(250);
@@ -352,7 +339,7 @@ void targetingMode()
 {
   if (num == NUM_PIXELS)
     num = 0;
-  for (int i = 0; i < NUM_PIXELS; i++)
+  for (uint8_t i = 0; i < NUM_PIXELS; i++)
   {
     if (i >= 0 + num && i < 1 + num)
       strip.setPixelColor(i, strip.Color(255, 0, 0));
@@ -366,7 +353,7 @@ void targetingMode()
 
 void raveMode()
 {
-  for (int i = 0; i < NUM_PIXELS; i++)
+  for (uint8_t i = 0; i < NUM_PIXELS; i++)
   {
     strip.setPixelColor(i, strip.Color(255, 255, 255, 255));
   }
