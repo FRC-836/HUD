@@ -21,8 +21,8 @@ uint8_t OPERATION_MODE = 1;
 
 //whether the pixels are on or not (ANTI-HEADACHE BOOLEAN)
 boolean POWERED = true;
-boolean GEAR1POWERED = true;
-boolean GEAR2POWERED = true;
+boolean RING1POWERED = true;
+boolean RING2POWERED = true;
 
 //colors that change with color mode
 uint32_t defaultColor;
@@ -32,8 +32,9 @@ uint32_t gearGettingColor;
 uint32_t raveColors;
 
 //neopixel STRIP
-Adafruit_NeoPixel STRIP = Adafruit_NeoPixel(NUM_PIXELS, PIN, 
-                                            NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel STRIP = Adafruit_NeoPixel(NUM_PIXELS, PIN, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel RING1 = Adafruit_NeoPixel(16, 0, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel RING2 = Adafruit_NeoPixel(16, 4, NEO_GRB + NEO_KHZ800);
 
 //colors that never change
 const uint32_t timeColor60 = STRIP.Color(0, 255, 0);
@@ -95,6 +96,8 @@ void receiveEvent(uint8_t howMany)
 
 void loop()
 {
+  ring1Lights();
+  ring2Lights();
   //switch on command
   switch (inputs[1])
   {
@@ -163,6 +166,24 @@ void loop()
       break;
   }
 }
+void ring1Lights()
+{
+  if (!RING1POWERED) return;
+  for (uint8_t i = 0; i < 16; i++)
+  {
+    RING1.setPixelColor(i, RING1.Color(255, 0, 255));
+  }
+  RING1.show();
+}
+void ring2Lights()
+{
+  if (!RING2POWERED) return;
+  for (uint8_t i = 0; i < 16; i++)
+  {
+    RING2.setPixelColor(i, RING2.Color(255, 0, 255));
+  }
+  RING2.show();
+}
 void setOpMode(uint8_t opMode)
 {
   switch(opMode)
@@ -225,17 +246,17 @@ void pixelsPowered(boolean powerState, uint8_t number)
   }
   else if (number == 2)
   {
-    GEAR1POWERED = powerState;
+    RING1POWERED = powerState;
   }
   else if (number == 3)
   {
-    GEAR2POWERED = powerState;
+    RING2POWERED = powerState;
   }
   else if (number == 4)
   {
     POWERED = powerState;
-    GEAR1POWERED = powerState;
-    GEAR2POWERED = powerState;
+    RING1POWERED = powerState;
+    RING2POWERED = powerState;
   }
 }
 
