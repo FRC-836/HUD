@@ -2,9 +2,9 @@
 #include <Wire.h>
 
 //constants
-const uint8_t  PIN = 7;
-const uint16_t NUM_PIXELS = 16;
-const uint8_t  BRIGHTNESS = 50;
+const uint8_t  PIN = 1;
+const uint16_t NUM_PIXELS = 27;
+const uint8_t  BRIGHTNESS = 70;
 
 //test for debugCommand.
 uint8_t red = 127; 
@@ -32,9 +32,9 @@ uint32_t gearGettingColor;
 uint32_t raveColors;
 
 //neopixel STRIP
-Adafruit_NeoPixel STRIP = Adafruit_NeoPixel(NUM_PIXELS, PIN, NEO_GRB + NEO_KHZ800);
-Adafruit_NeoPixel RING1 = Adafruit_NeoPixel(16, 0, NEO_GRB + NEO_KHZ800);
-Adafruit_NeoPixel RING2 = Adafruit_NeoPixel(16, 4, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel STRIP = Adafruit_NeoPixel(NUM_PIXELS, PIN, NEO_GRBW + NEO_KHZ800);
+Adafruit_NeoPixel RING1 = Adafruit_NeoPixel(16, 4, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel RING2 = Adafruit_NeoPixel(16, 5, NEO_GRB + NEO_KHZ800);
 
 //colors that never change
 const uint32_t timeColor60 = STRIP.Color(0, 255, 0);
@@ -80,6 +80,12 @@ void setup()
   //set initial color mode
   setColorMode(5);
   pixelsPowered(1, 1);
+  RING1.setBrightness(BRIGHTNESS);
+  RING2.setBrightness(BRIGHTNESS);
+  RING1.begin();
+  RING2.begin();
+  RING1.show();
+  RING2.show();
 }
 
 void receiveEvent(uint8_t howMany)
@@ -96,8 +102,15 @@ void receiveEvent(uint8_t howMany)
 
 void loop()
 {
-  ring1Lights();
-  ring2Lights();
+  //ring1Lights();
+  //ring2Lights();
+  for (int i = 0; i < 16; i++)
+  {
+    RING1.setPixelColor(i, RING1.Color(255, 0, 255));
+    RING2.setPixelColor(i, RING2.Color(255, 0, 255));
+  }
+  RING1.show();
+  RING2.show();
   //switch on command
   switch (inputs[1])
   {
@@ -331,7 +344,8 @@ void ballReceivingMode()
   if (!POWERED) return;
   for (uint16_t i = 0; i < NUM_PIXELS; i++)
   {
-    STRIP.setPixelColor(i, ballGettingColor);
+    //STRIP.setPixelColor(i, ballGettingColor);
+    STRIP.setPixelColor(i, STRIP.Color(0, 255, 0));
   }
   STRIP.show();
   return;
@@ -342,7 +356,8 @@ void gearReceivingMode()
   if (!POWERED) return;
   for (uint16_t i = 0; i < NUM_PIXELS; i++)
   {
-    STRIP.setPixelColor(i, gearGettingColor);
+    //STRIP.setPixelColor(i, gearGettingColor);
+    STRIP.setPixelColor(i, STRIP.Color(255, 0, 255));
   }
   STRIP.show();
   return;
