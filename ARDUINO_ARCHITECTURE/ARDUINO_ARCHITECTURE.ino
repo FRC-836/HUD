@@ -2,9 +2,12 @@
 #include <Wire.h>
 
 //constants
-const uint8_t  PIN = 7;
-const uint16_t NUM_PIXELS = 16;
+const   uint8_t  PIN = 7;
+const uint16_t NUM_PIXELS = 48;
 const uint8_t  BRIGHTNESS = 50;
+
+const uint8_t RING1_PIN = 2;  
+const uint8_t RING2_PIN = 1;
 
 //test for debugCommand.
 uint8_t red = 127; 
@@ -14,7 +17,7 @@ uint32_t col = ((uint32_t)red << 16) | ((uint32_t)green <<  8) | blue;
 // 0, 11, col, 4, 56 
 
 //packet
-uint8_t inputs[5] = { 0, 3, 0, 0, 0 };
+uint8_t inputs[5] = { 0, 4, 0, 0, 0 };
 
 //our current operation mode
 uint8_t OPERATION_MODE = 1;
@@ -32,9 +35,20 @@ uint32_t gearGettingColor;
 uint32_t raveColors;
 
 //neopixel STRIP
-Adafruit_NeoPixel STRIP = Adafruit_NeoPixel(NUM_PIXELS, PIN, NEO_GRB + NEO_KHZ800);
-Adafruit_NeoPixel RING1 = Adafruit_NeoPixel(16, 0, NEO_GRB + NEO_KHZ800);
-Adafruit_NeoPixel RING2 = Adafruit_NeoPixel(16, 4, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel STRIP = Adafruit_NeoPixel(NUM_PIXELS, PIN, NEO_GRBW + NEO_KHZ800);
+Adafruit_NeoPixel RING1 = Adafruit_NeoPixel(16, RING1_PIN, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel RING2 = Adafruit_NeoPixel(16, RING2_PIN, NEO_GRB + NEO_KHZ800);
+
+Adafruit_NeoPixel strip3  = Adafruit_NeoPixel(16 , 3, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel strip4  = Adafruit_NeoPixel(16, 4, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel strip5  = Adafruit_NeoPixel(16 , 5, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel strip6  = Adafruit_NeoPixel(16, 6, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel strip8  = Adafruit_NeoPixel(16, 8, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel strip9  = Adafruit_NeoPixel(16 , 9, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel RING10 = Adafruit_NeoPixel(16, 10, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel RING11 = Adafruit_NeoPixel(16 , 11, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel RING12 = Adafruit_NeoPixel(16, 12, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel RING13 = Adafruit_NeoPixel(16 , 13, NEO_GRB + NEO_KHZ800);
 
 //colors that never change
 const uint32_t timeColor60 = STRIP.Color(0, 255, 0);
@@ -67,7 +81,7 @@ enum class OP_MODE : uint8_t
 void setup() 
 {
   //setup I2C
-  Wire.begin(8);
+  Wire.begin(4);
   Wire.onReceive(receiveEvent);
 
   //set up serial (may be unnecessary)
@@ -75,16 +89,52 @@ void setup()
 
   //setup the neopixel STRIP
   STRIP.begin();
+  RING1.begin();
+  RING2.begin();
+  strip3.begin();
+  strip4.begin();
+  strip5.begin();
+  strip6.begin();
+  strip8.begin();
+  strip9.begin();
+  RING10.begin();
+  RING11.begin();
+  RING12.begin();
+  RING13.begin();
   STRIP.setBrightness(BRIGHTNESS);
+  RING1.setBrightness(80);
+  RING2.setBrightness(80);
+  strip3.setBrightness(80);
+  strip4.setBrightness(80); //adjust brightness here
+  strip5.setBrightness(80);
+  strip6.setBrightness(80);
+  strip8.setBrightness(80);
+  strip9.setBrightness(80);
+  RING10.setBrightness(80); //adjust brightness here
+  RING11.setBrightness(80);
+  RING12.setBrightness(80);
+  RING13.setBrightness(80);
+  RING1.show();
+  RING2.show();
+  strip3.show();
+  strip4.show();
+  strip5.show();
+  strip6.show();
+  strip8.show();
+  strip9.show();
+  RING10.show();
+  RING11.show();
+  RING12.show();
+  RING13.show();
   STRIP.show();
   //set initial color mode
-  setColorMode(5);
-  pixelsPowered(1, 1);
+  setColorMode(1);
 }
 
 void receiveEvent(uint8_t howMany)
 {
   uint8_t i = 0;
+  Serial.println("hello1");
   while (Wire.available())
   {
     if (i > 4)
@@ -96,8 +146,35 @@ void receiveEvent(uint8_t howMany)
 
 void loop()
 {
-  ring1Lights();
-  ring2Lights();
+//  ring1Lights();
+//  ring2Lights();
+    for(int i=0; i < RING1.numPixels(); i++)
+    {
+      RING1.setPixelColor(i, RING1.Color(255, 0, 255));
+      RING2.setPixelColor(i, RING1.Color(255, 0, 255));
+      strip3.setPixelColor(i, RING1.Color(255, 0, 255));
+      strip4.setPixelColor(i, RING1.Color(255, 0, 255));
+      strip5.setPixelColor(i, RING1.Color(255, 0, 255));
+      strip6.setPixelColor(i, RING1.Color(255, 0, 255));
+      strip8.setPixelColor(i, RING1.Color(255, 0, 255));
+      strip9.setPixelColor(i, RING1.Color(255, 0, 255));
+      RING10.setPixelColor(i, RING1.Color(255, 0, 255));
+      RING11.setPixelColor(i, RING1.Color(255, 0, 255));
+      RING12.setPixelColor(i, RING1.Color(255, 0, 255));
+      RING13.setPixelColor(i, RING1.Color(255, 0, 255));
+    }
+    RING1.show();
+    RING2.show();
+    strip3.show();
+    strip4.show();
+    strip5.show();
+    strip6.show();
+    strip8.show();
+    strip9.show();
+    RING10.show();
+    RING11.show();
+    RING12.show();
+    RING13.show();
   //switch on command
   switch (inputs[1])
   {
@@ -204,7 +281,7 @@ void setColorMode (uint8_t i)
   if (i == 1)
   {
     defaultColor = STRIP.Color(255, 0, 255);
-    pilotAttentionColor = STRIP.Color(255, 255, 255); // TODO: make it
+    pilotAttentionColor = STRIP.Color(0, 0, 0, 255); // TODO: make it
     ballGettingColor = STRIP.Color(0, 255, 0);
     gearGettingColor = STRIP.Color(255, 115, 0);
   }
@@ -422,10 +499,34 @@ void bothReceivingMode()
   if (!POWERED) return;
   for (uint16_t i = 0, count = 1; i < NUM_PIXELS; i++, count++)
   {
-    if (i < NUM_PIXELS / 4) STRIP.setPixelColor(i, ballGettingColor);
-    else if (i < NUM_PIXELS / 2) STRIP.setPixelColor(i, gearGettingColor);
-    else if (i < NUM_PIXELS * 3 / 4) STRIP.setPixelColor(i, ballGettingColor);
-    else STRIP.setPixelColor(i, gearGettingColor);
+    if (i < 25) 
+    {
+      if (i < 13)
+        STRIP.setPixelColor(i, ballGettingColor);
+      else
+        STRIP.setPixelColor(i, gearGettingColor);
+    }
+    else if (i < 33)
+    {
+      if (i > 28)
+        STRIP.setPixelColor(i, gearGettingColor);
+      else
+        STRIP.setPixelColor(i, ballGettingColor);
+    }
+    else if (i < 58)
+    {
+      if (i < 46)
+        STRIP.setPixelColor(i, ballGettingColor);
+      else
+        STRIP.setPixelColor(i, gearGettingColor);
+    }
+    else
+    {
+      if (i < 62)
+        STRIP.setPixelColor(i, ballGettingColor);
+      else
+        STRIP.setPixelColor(i, gearGettingColor);
+    }
   }
   STRIP.show();
   return;
@@ -500,12 +601,41 @@ void targetingMode(uint8_t startIndex, uint8_t endIndex)
 void raveMode()
 {
   if (!POWERED) return;
-  for (uint8_t i = 0; i < NUM_PIXELS; i++)
-  {
-    STRIP.setPixelColor(i, STRIP.Color(random(155), random(75), random(45)));
+//  for (uint8_t i = 0; i < NUM_PIXELS; i++)
+//  {
+//    STRIP.setPixelColor(i, STRIP.Color(random(155), random(75), random(45)));
+//  }
+//  STRIP.show();
+//  delay(75);
+  rainbowCycle(0);
+}
+
+void rainbowCycle(uint8_t wait) 
+{
+  uint16_t i, j;
+
+  for(j=0; j<256*5; j++)
+  { // 5 cycles of all colors on wheel
+    for(i=0; i< NUM_PIXELS; i++)
+    {
+      STRIP.setPixelColor(i, Wheel(((i * 256 / NUM_PIXELS) + j) & 255));
+    }
+    STRIP.show();
+    delay(wait);
   }
-  STRIP.show();
-  delay(75);
+}
+
+uint32_t Wheel(byte WheelPos) {
+  WheelPos = 255 - WheelPos;
+  if(WheelPos < 85) {
+    return STRIP.Color(255 - WheelPos * 3, 0, WheelPos * 3);
+  }
+  if(WheelPos < 170) {
+    WheelPos -= 85;
+    return STRIP.Color(0, WheelPos * 3, 255 - WheelPos * 3);
+  }
+  WheelPos -= 170;
+  return STRIP.Color(WheelPos * 3, 255 - WheelPos * 3, 0);
 }
 
 void commandTemplateA(uint8_t startIndex, uint8_t endIndex)
